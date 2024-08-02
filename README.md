@@ -6,7 +6,7 @@ The purpose of this project was to deploy a Flask application called **_Kura Qui
 
 ## STEPS
 
-1: **Configure Security Groups**
+1. **Configure Security Groups**
 - **Why:** Kura QuikBuks uses EC2's accessible via SSH, Jenkins to create CI/CD Pipeline, Gunicorn as a WSGI server for the Flask application. If Ports 22, 8080 and 800 aren't open, nothing will work.
 - **How**: I created a Security Group that ensured Ports 22, 8080 and 8000 were accepting inbound traffic, and allowed all outbound traffic through all ports to ensure any customer can be served. 
 
@@ -104,7 +104,7 @@ The purpose of this project was to deploy a Flask application called **_Kura Qui
 - **Configuration Management:** Properly configuring services like NGINX and Gunicorn is critical to the smooth operation of a web application. Misconfigurations can lead to hard-to-trace errors that disrupt the deployment pipeline.
 
 ## DOCUMENTATION
-(Link to Jenkins successful scan)[https://github.com/tortiz7/C5_Deployment_Workload_1/blob/main/Documentation/Jenkins%20Kura%20QuikBuks%20Successful%20Scan.png]
+[Link to Jenkins successful scan](https://github.com/tortiz7/C5_Deployment_Workload_1/blob/main/Documentation/Jenkins%20Kura%20QuikBuks%20Successful%20Scan.png)
 
 ## CONCLUSION
 
