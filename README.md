@@ -7,33 +7,33 @@ The purpose of this project was to deploy a Flask application called **_Kura Qui
 ## STEPS
 
 1: **Configure Security Groups**
-   - **Why:** Kura QuikBuks uses EC2's accessible via SSH, Jenkins to create CI/CD Pipeline, Gunicorn as a WSGI server for the Flask application. If Ports 22, 8080 and 800 aren't open, nothing will work.
-   - **How**: I created a Security Group that ensured Ports 22, 8080 and 8000 were accepting inbound traffic, and allowed all outbound traffic through all ports to ensure any customer can be served. 
+- **Why:** Kura QuikBuks uses EC2's accessible via SSH, Jenkins to create CI/CD Pipeline, Gunicorn as a WSGI server for the Flask application. If Ports 22, 8080 and 800 aren't open, nothing will work.
+- **How**: I created a Security Group that ensured Ports 22, 8080 and 8000 were accepting inbound traffic, and allowed all outbound traffic through all ports to ensure any customer can be served. 
 
 2. **Set Up the EC2 Instances:**
-   - **Why:** EC2 instances were needed to run Jenkins and host the application. They provided the computing resources required to manage and deploy the Flask app.
-   - **How:** I launched two EC2 instances – one for Jenkins and one as part of the Elastic Beanstalk environment.
+- **Why:** EC2 instances were needed to run Jenkins and host the application. They provided the computing resources required to manage and deploy the Flask app.
+- **How:** I launched two EC2 instances – one for Jenkins and one as part of the Elastic Beanstalk environment.
 
 3. **Install Jenkins:**
-   - **Why:** Jenkins is crucial for automating the build and deployment process. It pulls the code from GitHub, tests the code's logic, and deploys the app.
-   - **How:** Jenkins was installed on an EC2 instance, and the necessary plugins were added to enable GitHub integration, allowing us to link our GitHub repository with the source code Jenkins needed.
+ - **Why:** Jenkins is crucial for automating the build and deployment process. It pulls the code from GitHub, tests the code's logic, and deploys the app.
+ - **How:** Jenkins was installed on an EC2 instance, and the necessary plugins were added to enable GitHub integration, allowing us to link our GitHub repository with the source code Jenkins needed.
   
 4. **Build via Jenkins:**
-   - **Why:** Jenkins is the backbone of my CI/CD pipeline. Jenkins was used to build the app, test the source code, validate that the logic's sound, and rebuild whenever changes were pushed to the GitHub repo.
-   - **How:** Created a Jenkins pipeline that pulls code from GitHub and confirms the app was ready for deployment, with the ability to rebuild and validate again whenever changes to the repo were made.
+- **Why:** Jenkins is the backbone of my CI/CD pipeline. Jenkins was used to build the app, test the source code, validate that the logic's sound, and rebuild whenever changes were pushed to the GitHub repo.
+- **How:** Created a Jenkins pipeline that pulls code from GitHub and confirms the app was ready for deployment, with the ability to rebuild and validate again whenever changes to the repo were made.
 
 5. **Configure Elastic Beanstalk:**
-   - **Why:** Elastic Beanstalk simplifies application deployment by managing the underlying infrastructure, handling scaling, and providing a platform for deploying the Flask app.
-   - **How:** A Python environment was created in Elastic Beanstalk, where I uploaded the application's code packaged as a ZIP file.
+- **Why:** Elastic Beanstalk simplifies application deployment by managing the underlying infrastructure, handling scaling, and providing a platform for deploying the Flask app.
+- **How:** A Python environment was created in Elastic Beanstalk, where I uploaded the application's code packaged as a ZIP file.
 
 6. **Understanding Gunicorn and NGINX:**
-   - **Why:** Gunicorn is a WSGI server for serving the Flask app, and NGINX is used as a reverse proxy to handle client requests and pass them to Gunicorn.
-   - **How:** The configs for Gunicorn and NGINX are provided in the source code, but it's important to know that Gunicorn is bound to `127.0.0.1:8000` and NGINX is configured to forward requests to Gunicorn.
+- **Why:** Gunicorn is a WSGI server for serving the Flask app, and NGINX is used as a reverse proxy to handle client requests and pass them to Gunicorn.
+- **How:** The configs for Gunicorn and NGINX are provided in the source code, but it's important to know that Gunicorn is bound to `127.0.0.1:8000` and NGINX is configured to forward requests to Gunicorn.
 
 
 ## SYSTEM DESIGN DIAGRAM
 
-
+[Link to the system design diagram for QuikBuks](https://github.com/tortiz7/C5_Deployment_Workload_1/blob/main/Documentation/Kura%20QuikBuks%20System%20Diagram.drawio.png)
 
 ## ISSUES/TROUBLESHOOTING
 
@@ -43,7 +43,7 @@ The purpose of this project was to deploy a Flask application called **_Kura Qui
   
   **Solution:** Restructured the ZIP file to have the source files directly under the main folder.
  
- ### Jenkins, Python, and Dependencies Installation Script Issues
+ ### Jenkins, Python, and Dependencies Installation Script Issues:
 
   **Problem:** Initially, I encountered persistent issues with the installation script provided in the project assignment files. The script was supposed to install Jenkins, Python, and the necessary dependencies on the EC2 instance, but it consistently failed, leading to multiple instance terminations and re-creations.
 
@@ -51,7 +51,7 @@ The purpose of this project was to deploy a Flask application called **_Kura Qui
 
 **Solution:**  By refining the installation script to include the correct repositories and ensuring all dependencies were specified, I was able to get Jenkins, Python, and the necessary libraries installed correctly. This allowed me to proceed with the project without further interruptions.
 
-### Chasing Phantom Issues:###
+### Chasing Phantom Issues:
 
 **VPC Security Settings:**
   - **Problem:** Thought the issue might be related to VPC security settings, suspecting that certain rules were blocking the necessary traffic.
@@ -69,11 +69,11 @@ The purpose of this project was to deploy a Flask application called **_Kura Qui
   - **Problem:** I spent time adjusting NGINX configurations, believing that the 502 Bad Gateway errors were due to incorrect proxy settings or conflicting configurations.
   - **Solution:** The NGINX configuration was fine. The real issue was the misconfigured application structure in the uploaded ZIP file.
 
-- **Gunicorn Installation:**
+**Gunicorn Installation:**
   - **Problem:** Suspected that Gunicorn might not be correctly installed or configured in the Elastic Beanstalk environment.
   - **Solution:** Gunicorn was installed correctly, but it couldn’t locate the `application.py` module due to the incorrect directory structure.
 
-  ## Lesson:##  Focus on the basics first – directory structures, file paths, and service configurations.
+  ### Lesson:  Focus on the basics first – directory structures, file paths, and service configurations.
 
 ## OPTIMIZATIONS
 
@@ -104,7 +104,7 @@ The purpose of this project was to deploy a Flask application called **_Kura Qui
 - **Configuration Management:** Properly configuring services like NGINX and Gunicorn is critical to the smooth operation of a web application. Misconfigurations can lead to hard-to-trace errors that disrupt the deployment pipeline.
 
 ## DOCUMENTATION
-- Link to Jenkins successful scan
+(Link to Jenkins successful scan)[https://github.com/tortiz7/C5_Deployment_Workload_1/blob/main/Documentation/Jenkins%20Kura%20QuikBuks%20Successful%20Scan.png]
 
 ## CONCLUSION
 
