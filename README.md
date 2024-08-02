@@ -16,7 +16,7 @@ The purpose of this project was to deploy a Flask application called **_Kura Qui
 
 3. **Install Jenkins:**
  - **Why:** Jenkins is crucial for automating the build and deployment process. It pulls the code from GitHub, tests the code's logic, and deploys the app.
- - **How:** Jenkins was installed on an EC2 instance, and the necessary plugins were added to enable GitHub integration, allowing us to link our GitHub repository with the source code Jenkins needed.
+ - **How:** Jenkins was installed on an EC2 instance, and the necessary plugins were added to enable GitHub integration, allowing me to link my GitHub repository with the source code Jenkins needed.
   
 4. **Build via Jenkins:**
 - **Why:** Jenkins is the backbone of my CI/CD pipeline. Jenkins was used to build the app, test the source code, validate that the logic's sound, and rebuild whenever changes were pushed to the GitHub repo.
