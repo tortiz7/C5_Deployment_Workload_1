@@ -1,128 +1,114 @@
+# Kura QuikBuks: A Cloud-Based CI/CD Deployment on AWS
 
-# Kura Labs Cohort 5- Deployment Workload 1
-## Intro to CI/CD
+## PURPOSE
 
-Welcome to Deployment Workload 1!  By now you’ve learned about system designs and the CI/CD Pipeline.  Let’s start putting it all together and see it in action.  
+The purpose of this project was to deploy a Flask application called **_Kura QuikBuks_** using AWS services, specifically focusing on creating a CI/CD pipeline with Jenkins, AWS EC2, and Elastic Beanstalk. The project aimed to integrate cloud-based services and DevOps tools to streamline the deployment process, ensuring that changes made in the application's source code are automatically tested and validated.
 
-Be sure to document each step in the process and explain WHY each step is important to the pipeline.
+## STEPS
 
-## Instructions
+1: **Configure Security Groups**
+   - **Why:** Kura QuikBuks uses EC2's accessible via SSH, Jenkins to create CI/CD Pipeline, Gunicorn as a WSGI server for the Flask application. If Ports 22, 8080 and 800 aren't open, nothing will work.
+   - **How**: I created a Security Group that ensured Ports 22, 8080 and 8000 were accepting inbound traffic, and allowed all outbound traffic through all ports to ensure any customer can be served. 
 
-1. Clone this repository to your GitHub account
-2. Create an EC2
+2. **Set Up the EC2 Instances:**
+   - **Why:** EC2 instances were needed to run Jenkins and host the application. They provided the computing resources required to manage and deploy the Flask app.
+   - **How:** I launched two EC2 instances – one for Jenkins and one as part of the Elastic Beanstalk environment.
 
-	a. Follow document: [AWS EC2 Quickstart Guide](https://github.com/kura-labs-org/AWS-EC2-Quick-Start-Guide/blob/main/AWS%20EC2%20Quick%20Start%20Guide.pdf) if needed
-3. Install Jenkins onto the EC2
-
-	a. Connect to the EC2 terminal
-
- 	b. Enter the following commands to install Jenkins:
-
-```
-    $sudo apt update && sudo apt install fontconfig openjdk-17-jre software-properties-common && sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt install python3.7 python3.7-venv
-    $sudo wget -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-    $echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
-    $sudo apt-get update
-    $sudo apt-get install jenkins
-    $sudo systemctl start jenkins
-    $sudo systemctl status jenkins
-
-```
-
-If successful, the last command should show the Jenkins service “active (running)”
-
-4. Log into Jenkins
-
-	a. Enter initial admin password
-
-	b. Install suggested plugins
-
-	c. Create first admin user
-
-5. Create a Multi-Branch pipeline
-
-	a. Click on “New Item” in the menu on the left of the page
-
-	b. Enter a name for your pipeline
+3. **Install Jenkins:**
+   - **Why:** Jenkins is crucial for automating the build and deployment process. It pulls the code from GitHub, tests the code's logic, and deploys the app.
+   - **How:** Jenkins was installed on an EC2 instance, and the necessary plugins were added to enable GitHub integration, allowing us to link our GitHub repository with the source code Jenkins needed.
   
-    c. Select “Multibranch Pipeline”
+4. **Build via Jenkins:**
+   - **Why:** Jenkins is the backbone of my CI/CD pipeline. Jenkins was used to build the app, test the source code, validate that the logic's sound, and rebuild whenever changes were pushed to the GitHub repo.
+   - **How:** Created a Jenkins pipeline that pulls code from GitHub and confirms the app was ready for deployment, with the ability to rebuild and validate again whenever changes to the repo were made.
+
+5. **Configure Elastic Beanstalk:**
+   - **Why:** Elastic Beanstalk simplifies application deployment by managing the underlying infrastructure, handling scaling, and providing a platform for deploying the Flask app.
+   - **How:** A Python environment was created in Elastic Beanstalk, where I uploaded the application's code packaged as a ZIP file.
+
+6. **Understanding Gunicorn and NGINX:**
+   - **Why:** Gunicorn is a WSGI server for serving the Flask app, and NGINX is used as a reverse proxy to handle client requests and pass them to Gunicorn.
+   - **How:** The configs for Gunicorn and NGINX are provided in the source code, but it's important to know that Gunicorn is bound to `127.0.0.1:8000` and NGINX is configured to forward requests to Gunicorn.
+
+
+## SYSTEM DESIGN DIAGRAM
+
+
+
+## ISSUES/TROUBLESHOOTING
+
+### Elastic Beanstalk Environment Misconfigurations:
   
-    d. Under “Branch Sources”, click “Add source” and select “GitHub”
+   **Problem:** This turned out to be my biggest problem deploying the Kura Quik Buks retail app correctly. Elastic Beanstalk couldn't find the application module due to incorrect directory structure in the uploaded ZIP file. The source files were buried within a folder, which prevented Gunicorn from accessing them.
   
-    e. Click “+ Add” and select “Jenkins”
-  
-    f. Make sure “Kind” reads “Username and password”
+  **Solution:** Restructured the ZIP file to have the source files directly under the main folder.
+ 
+ ### Jenkins, Python, and Dependencies Installation Script Issues
 
-    g. Under “Username”, enter your GitHub username
+  **Problem:** Initially, I encountered persistent issues with the installation script provided in the project assignment files. The script was supposed to install Jenkins, Python, and the necessary dependencies on the EC2 instance, but it consistently failed, leading to multiple instance terminations and re-creations.
 
-    h. Under “Password” ,enter your GitHub personal access token
+  **Troubleshooting:**  After several attempts, it became clear that the script had some configuration errors and missing dependencies. I modified the script by ensuring that all necessary repositories were added, particularly for Python 3.7, which is deprecated and requires a specific repository (deadsnakes) to install correctly.
 
-To get the GitHub personal access token, first log into GitHub and click on your profile icon on the top right of the page.
+**Solution:**  By refining the installation script to include the correct repositories and ensuring all dependencies were specified, I was able to get Jenkins, Python, and the necessary libraries installed correctly. This allowed me to proceed with the project without further interruptions.
 
-i. On the dropdown menu, click on “Settings”
+### Chasing Phantom Issues:###
 
-ii. Click on “<> Developer settings at the bottom of the menu on the left of the page
+**VPC Security Settings:**
+  - **Problem:** Thought the issue might be related to VPC security settings, suspecting that certain rules were blocking the necessary traffic.
+  - **Solution:** The security group settings were correct, and the actual issue was unrelated to VPC settings. It was more about ensuring the application files were in the correct directory structure.
 
-iii. Click on “Personal access tokens” on the menu on the left of the page and select “Tokens (classic)”
+**PHP-FPM Configuration:**
+  - **Problem:** While troubleshooting NGINX, I considered whether PHP-FPM might be required or misconfigured, despite the project being built with Flask.
+  - **Solution:** PHP-FPM is for PHP applications, and since the project was Python-based, this was irrelevant. The focus needed to remain on Python-specific configurations.
 
-iv. Click “Generate new token” and select the classic option
+**Environment Variables:**
+  - **Problem:** I speculated that additional environment variables might be needed to point to the right directories or modules.
+  - **Solution:** The existing environment variables were set correctly, and the problem lied elsewhere — in the directory structure of the uploaded ZIP file.
 
-v. Set an expiration date and then select the following "scopes": repo, admin:repo_hook
+**NGINX Configuration Errors:**
+  - **Problem:** I spent time adjusting NGINX configurations, believing that the 502 Bad Gateway errors were due to incorrect proxy settings or conflicting configurations.
+  - **Solution:** The NGINX configuration was fine. The real issue was the misconfigured application structure in the uploaded ZIP file.
 
-This token can only be viewed ONCE! Make sure you enter the token properly (or save it) before leaving the page otherwise a new token must be generated!
+- **Gunicorn Installation:**
+  - **Problem:** Suspected that Gunicorn might not be correctly installed or configured in the Elastic Beanstalk environment.
+  - **Solution:** Gunicorn was installed correctly, but it couldn’t locate the `application.py` module due to the incorrect directory structure.
 
-6. Connect GitHub repository to Jenkins
+  ## Lesson:##  Focus on the basics first – directory structures, file paths, and service configurations.
 
-	a. Enter the repository HTTPS URL and click "Validate"
-  
-	b. Make sure that the "Build Configuration" section says "Mode: by Jenkinsfile" and "Script Path: Jenkinsfile"
-  
-	c. Click "Save" and a build should start automatically
+## OPTIMIZATIONS
 
-Did the build stages successfully complete? If not, why? How did you resolve the issue?  What did each stage do?
+**True Jenkins Automation**
+  - **AWS CLI:** The biggest roadblock for deployment was the nested source code folder in the .zip used to create the Elastic Beanstalk environment. This could have been avoided by deploying via command-line.
+  - **Automated Jenkins Deployment:** With AWS CLI installed in the EC2 instance, the pipeline script could've been configured so Jenkins can automatically deploy the project after building and validating code.
+  - **CI/CD Unleashed:** By automating deployment this way, Jenkins can redploy Kura QuikBuks everytime there are changes made to the source code in the GitHub Repo, ensuring a proper CI/CD pipeline.
 
-7. After successfully completing the build (provide screenshot of successful build in documentation), download the contents of the repository (the one in your personal GitHub NOT the kuralabs repo!) and upload a zip file of the application it to AWS Elastic Beanstalk.
-  
-	a. First, follow the instructions in this [LINK](https://scribehow.com/shared/How_to_Create_an_AWS_IAM_Role_for_Elastic_Beanstalk_and_EC2__kTg4B7zRRxCp-aYTJc-WLg) for "How to Create an AWS IAM Role for Elastic Beanstalk and EC2" and create the two IAM roles as specified.
+**Benefits of Using Managed Services:**
+   - **Simplified Management:** Managed services like Elastic Beanstalk reduce the need for manual infrastructure management, allowing you to focus on the application code.
+   - **Scalability:** Automatically handles scaling based on traffic, which is crucial for retail banking applications that may experience variable load.
+   - **Security:** AWS provides built-in security features and compliance with industry standards, easing the burden on development teams.
 
-    b. Navigate to the AWS Elastic Beanstalk console page
+**Issues for Retail Banks:**
+   - **Compliance and Data Privacy:** Retail banks have strict data privacy regulations. Managed services may not provide the level of control needed to ensure compliance with regulations like GDPR or PCI-DSS.
+   - **Vendor Lock-In:** Using a managed service ties you to the provider’s ecosystem, which can be a risk if you need to migrate to another platform in the future.
+   - **Mitigation:** Opt for hybrid models where sensitive data is handled on-premises, and less sensitive workloads are managed in the cloud.
 
-    c. Navigate to the "Environments" page on the left side menu and click on "Create Environment"
+**Disadvantages of Using Elastic Beanstalk:**
+   - **Limited Customization:** Elastic Beanstalk abstracts a lot of the infrastructure details, which can limit your ability to customize configurations.
+   - **Dependency on AWS:** Being tied to AWS’s ecosystem can be a disadvantage if you ever need to switch providers.
+   - **Mitigation:** Use Elastic Beanstalk for initial deployments and scale, but consider transitioning to containerized environments like Kubernetes for more control.
+ 
+## LESSONS LEARNED
 
-    d. Create a "Web server environment" and enter the an Application name (Environment name should auto populate after that)
+- **EC2 and Elastic Beanstalk Integration:** Understanding how Elastic Beanstalk automates environment setups on EC2 instances helped streamline the deployment process, though it required careful attention to file structure and configurations.
+- **Jenkins CI/CD Pipeline:** The automation provided by Jenkins significantly reduces time spent testing and implementing code changes and can streamline deployments, highlighting the importance of automation in modern development workflows.
+- **Configuration Management:** Properly configuring services like NGINX and Gunicorn is critical to the smooth operation of a web application. Misconfigurations can lead to hard-to-trace errors that disrupt the deployment pipeline.
 
-    e. Choose "Python 3.7" as the "Managed platform"
+## DOCUMENTATION
+- Link to Jenkins successful scan
 
-    f. "Upload your code" by choosing a "local file" and select the zipped application files you created earlier.
+## CONCLUSION
 
-    g. Under "Presets", make sure that "Single instance (free tier eligible) is selected and then click "Next"
+Deploying the Kura QuikBuks project using AWS services provided a deep dive into the complexities and conveniences of cloud-based deployments. By integrating Jenkins for CI/CD, I ensured that the deployment process was efficient and reliable. Although I encountered numerous challenges, each was an opportunity to learn more about cloud infrastructure and deployment strategies. This project emphasized the importance of proper configuration, the challenges of working with legacy software versions, and the need for careful planning when using managed services. Looking forward, optimizing the deployment process and considering alternative deployment methods will be key to scaling and maintaining the application.
 
-    h. Select the "Service role" and "EC2 profile" in the appropriate drop down menus and then click "Next"
 
-    i. Select the default VPC and Subnet "us-east-1a" and then click "Next"
-
-    j. Select "General Purpose (SSD) for "Root volume type" and assign it 10 GB.
-
-    k. Ensure that "Single instance" is selected for the "Environment type" and that ONLY "t3.micro" is selected for instance types (remove all others if present) and then click "Next"
-
-    l. Select 'BASIC' health reporting under the monitoring section. NOT "ENHANCED"!
-
-    m. Continue to the "Review" page and then click "Submit".
-
-    n. When the "environment is successfully launched", click on the link provided in the "Domain" and confirm that the application has deployed!
-
-8. Document! All projects have documentation so that others can read and understand what was done and how it was done. Create a README.md file in your repository that describes:
-
-	a. The "PURPOSE" of the Workload, 
-	
-	b. The "STEPS" taken (and why each was necessary/important, 
-	
-	c. A "SYSTEM DESIGN DIAGRAM" that is created in draw.io, 
-	
-	d. "ISSUES/TROUBLESHOOTING" that may or may have occured, 
-	
-	e. An "OPTIMIZATION" section for that answers the question: What are the benefits of using managed services for cloud infrastructure?  What are some issues that a retail bank would face choosing this method of deployment and how would you address/resolve them? What are other disadvantages of using elastic beanstalk or similar managed services for deploying applications?
-	
-	f. A "CONCLUSION" statement as well as any other sections you feel like you want to include.
-
-The README.md is a markdown file that has unique formatting.  Be sure to look up how to write in markdown or use a txt to markdown converter. 
+---
